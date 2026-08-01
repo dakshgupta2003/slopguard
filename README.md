@@ -6,6 +6,8 @@
 
 Blocks AI-hallucinated and typosquatted dependencies before they install — for npm, pip, uv, yarn and pnpm.
 
+![slopguard blocking a hallucinated package](https://raw.githubusercontent.com/dakshgupta2003/slopguard/main/docs/demo.gif)
+
 ## The attack
 
 AI coding assistants invent package names that do not exist. Attackers register those exact names and fill them with malware, so the next developer who follows the same suggestion installs a real package containing someone else's code. This is called **slopsquatting**.
