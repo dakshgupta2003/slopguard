@@ -193,8 +193,8 @@ Three gaps are left open on purpose:
 - **A Python script that runs pip itself slips past the shim.**
   > Protecting a venv moves the real interpreter aside and stands a shim in front of it. But a script that is already running holds the real path in `sys.executable`, so `subprocess.run([sys.executable, "-m", "pip", "install", "x"])` walks around us. Catching it needs a `.pth` hook in site-packages — Python shipped inside a Node tool, re-tested against every pip release — to close a door only accidents open.
 
-- **The hallucination list is a small seed set.**
-  > It matters less than it sounds. If nobody registered the fake name, the 404 flags it and the list adds nothing. If an attacker did register it, being brand new, undownloaded and repo-less already scores 55 — past the warn line at 35. The list mainly turns those warnings into outright blocks.
+- **The hallucination list covers Python much better than npm.**
+  > 116 PyPI names against 2 for npm, because the published research we could licence is Python-only. It lives in [`src/data/hallucinations.json`](src/data/hallucinations.json) — a flat JSON file, no code involved, and pull requests adding names are welcome. Add the replacement to [`src/data/alternatives.json`](src/data/alternatives.json) too, so a block tells the user what to install instead.
 
 ## Development
 
@@ -205,4 +205,4 @@ npm test
 
 ## License
 
-MIT
+MIT. Bundled data keeps its own licence — see [THIRD-PARTY.md](THIRD-PARTY.md).
