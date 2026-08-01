@@ -54,7 +54,7 @@ npm install
 npm link
 ```
 
-This installs slopguard once for your whole machine. It is not added as a dependency of any project, and you do not repeat it per repo.
+This installs slopguard once for your whole machine. It is not added as a dependency of any project, and you do not repeat it per repo. `npm link` points back at the clone, so leave that directory where it is.
 
 Then protect every install on your machine:
 
@@ -63,6 +63,10 @@ slopguard init
 ```
 
 Open a new terminal. That is the whole setup — `npm`, `pip`, `uv`, `yarn` and `pnpm` are now checked before they run.
+
+For `uv` that covers every subcommand which installs from an index: `uv pip install`, `uv pip sync`, `uv add`, `uv sync`, `uv tool install`, `uv tool run`, `uvx` and `uv run --with`. Everything else runs untouched.
+
+> Already had slopguard installed? Re-run `slopguard init` to pick up managers added since.
 
 ## Where it plugs in
 
@@ -179,13 +183,20 @@ slopguard allow pip your-package
 
 If slopguard cannot reach a registry it allows the install and says so. A security tool that breaks your installer is a security tool people uninstall.
 
-## Limitations
+## Scope
 
-- Direct dependencies only — transitive and lockfile packages are not checked.
-- For `uv`, only the subcommands that install from an index are read: `uv pip install`, `uv pip sync`, `uv add`, `uv sync`, `uv tool install`, `uv tool run`, `uvx` and `uv run --with`. Anything else passes straight through.
-- A Python process calling `subprocess.run([sys.executable, "-m", "pip", ...])` bypasses the shim.
-- The hallucination list is a small seed set; the typosquat detectors do the heavy lifting today.
-- `npm link` points at the clone, so moving or deleting that directory breaks the `slopguard` command.
+slopguard checks the **names** you and your AI are about to install. It does not audit what is inside a package.
+
+Three gaps are left open on purpose:
+
+- **Direct dependencies only.**
+  > A hallucinated name always arrives as a direct dependency — that is where the model suggests it. Transitive risk is a different attack, and `npm audit`, OSV and Socket already cover it properly.
+
+- **`subprocess.run([sys.executable, "-m", "pip", ...])` slips past the shim.**
+  > Inside a running interpreter `sys.executable` is the real binary, not the shim. Closing it means shipping a `.pth` hook into site-packages — Python code inside a Node tool, fragile across pip versions — to catch a path that only accidents take.
+
+- **The hallucination list is a small seed set.**
+  > It is the least load-bearing signal. An unregistered name 404s and gets flagged regardless; a registered one already scores 55 from age, downloads and missing repo. The list mostly promotes a warn to a block.
 
 ## Development
 
