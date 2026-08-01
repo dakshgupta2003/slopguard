@@ -66,8 +66,6 @@ Open a new terminal. That is the whole setup — `npm`, `pip`, `uv`, `yarn` and 
 
 For `uv` that covers every subcommand which installs from an index: `uv pip install`, `uv pip sync`, `uv add`, `uv sync`, `uv tool install`, `uv tool run`, `uvx` and `uv run --with`. Everything else runs untouched.
 
-> Already had slopguard installed? Re-run `slopguard init` to pick up managers added since.
-
 ## Where it plugs in
 
 | Layer | Command | Use when |
@@ -190,13 +188,13 @@ slopguard checks the **names** you and your AI are about to install. It does not
 Three gaps are left open on purpose:
 
 - **Direct dependencies only.**
-  > A hallucinated name always arrives as a direct dependency — that is where the model suggests it. Transitive risk is a different attack, and `npm audit`, OSV and Socket already cover it properly.
+  > `npm install express` also installs dozens of packages you never named. slopguard checks `express`, not those dozens. A model can only put a fake name where *you* type it — rewriting express's own dependency list takes a compromised maintainer, which is a different attack that `npm audit`, OSV and Socket already handle.
 
-- **`subprocess.run([sys.executable, "-m", "pip", ...])` slips past the shim.**
-  > Inside a running interpreter `sys.executable` is the real binary, not the shim. Closing it means shipping a `.pth` hook into site-packages — Python code inside a Node tool, fragile across pip versions — to catch a path that only accidents take.
+- **A Python script that runs pip itself slips past the shim.**
+  > Protecting a venv moves the real interpreter aside and stands a shim in front of it. But a script that is already running holds the real path in `sys.executable`, so `subprocess.run([sys.executable, "-m", "pip", "install", "x"])` walks around us. Catching it needs a `.pth` hook in site-packages — Python shipped inside a Node tool, re-tested against every pip release — to close a door only accidents open.
 
 - **The hallucination list is a small seed set.**
-  > It is the least load-bearing signal. An unregistered name 404s and gets flagged regardless; a registered one already scores 55 from age, downloads and missing repo. The list mostly promotes a warn to a block.
+  > It matters less than it sounds. If nobody registered the fake name, the 404 flags it and the list adds nothing. If an attacker did register it, being brand new, undownloaded and repo-less already scores 55 — past the warn line at 35. The list mainly turns those warnings into outright blocks.
 
 ## Development
 
