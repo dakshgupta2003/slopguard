@@ -194,8 +194,8 @@ Three gaps are left open on purpose:
   > Protecting a venv moves the real interpreter aside and stands a shim in front of it. But a script that is already running holds the real path in `sys.executable`, so `subprocess.run([sys.executable, "-m", "pip", "install", "x"])` walks around us. Catching it needs a `.pth` hook in site-packages — Python shipped inside a Node tool, re-tested against every pip release — to close a door only accidents open.
 
 - **The hallucination list covers Python much better than npm.**
-  > 116 PyPI names against 2 for npm, because the published research we could licence is Python-only. It lives in [`src/data/hallucinations.json`](src/data/hallucinations.json) — a flat JSON file, no code involved, and pull requests adding names are welcome. Add the replacement to [`src/data/alternatives.json`](src/data/alternatives.json) too, so a block tells the user what to install instead.
-
+  > 116 PyPI names against 2 for npm, because the published research we could licence is Python-only. It lives in [`src/data/hallucinations.json`](src/data/hallucinations.json) — a flat JSON file, no code involved, and pull requests adding names are welcome.
+  
 ## Development
 
 ```bash
