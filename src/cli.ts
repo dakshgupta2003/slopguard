@@ -10,6 +10,7 @@ import { installGitHook, uninstallGitHook } from "./githook.js";
 import { allManifestPaths } from "./manifest/index.js";
 import { scanManifests } from "./manifest/scan.js";
 import { basename, resolve } from "node:path";
+import { readFileSync } from "node:fs";
 import type { CheckResult, Level } from "./types.js";
 
 const USAGE_EXIT = 64;
@@ -27,7 +28,7 @@ const EXIT: Record<Level, number> = {
 };
 
 const USAGE = `usage:
-  slopguard <pip|npm|yarn|pnpm> <package>   check a package
+  slopguard <manager> <package>             check a package (npm, pip, uv, yarn, pnpm, bun ...)
   slopguard init                            protect every install on this machine
   slopguard uninstall                       remove shims and restore PATH
   slopguard allow <pip|npm> <package>       permanently allow a package
@@ -36,7 +37,8 @@ const USAGE = `usage:
   slopguard unhook                          remove the pre-commit hook
   slopguard mcp                             run the MCP server for AI agents
   slopguard protect [venv]                  guard pip inside a virtualenv
-  slopguard unprotect [venv]                restore a virtualenv's own pip`;
+  slopguard unprotect [venv]                restore a virtualenv's own pip
+  slopguard --version                       print the installed version`;
 
 async function main(argv: string[]): Promise<number> {
   const [command, ...rest] = argv;
@@ -47,6 +49,10 @@ async function main(argv: string[]): Promise<number> {
     case "--help":
       console.log(USAGE);
       return command === undefined ? USAGE_EXIT : 0;
+    case "--version":
+    case "-v":
+      console.log(version());
+      return 0;
     case "init":
       return init();
     case "uninstall":
@@ -72,6 +78,11 @@ async function main(argv: string[]): Promise<number> {
     default:
       return check(argv);
   }
+}
+
+function version(): string {
+  const manifest = new URL("../package.json", import.meta.url);
+  return JSON.parse(readFileSync(manifest, "utf8")).version;
 }
 
 async function check(args: string[]): Promise<number> {

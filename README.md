@@ -80,7 +80,7 @@ To undo all of it:
 slopguard uninstall
 ```
 
-That removes the shims and takes the `PATH` line back out of your shell config.
+That removes the shims and takes the `PATH` line back out of your shell config. Run it *before* `npm rm -g @daksh_dev_2003/slopguard` — once the command is gone there is nothing left to clean up the `PATH` line for you.
 
 ## Where it plugs in
 
