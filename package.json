@@ -2,6 +2,16 @@
   "name": "slopguard",
   "version": "0.1.0",
   "description": "Blocks AI-hallucinated and slopsquatted packages before they install.",
+  "license": "MIT",
+  "author": "Daksh Gupta",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dakshgupta2003/slopguard.git"
+  },
+  "bugs": {
+    "url": "https://github.com/dakshgupta2003/slopguard/issues"
+  },
+  "homepage": "https://github.com/dakshgupta2003/slopguard#readme",
   "type": "module",
   "bin": {
     "slopguard": "dist/cli.js"
