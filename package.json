@@ -1,6 +1,6 @@
 {
   "name": "@daksh_dev_2003/slopguard",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Blocks AI-hallucinated and slopsquatted packages before they install.",
   "license": "MIT",
   "author": "Daksh Gupta",
