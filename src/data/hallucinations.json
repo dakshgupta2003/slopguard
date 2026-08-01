@@ -1,0 +1,4 @@
+{
+  "pip": ["securehashlib", "pyhashlib", "requestlib"],
+  "npm": ["react-codeshift", "fastjsonparser"]
+}

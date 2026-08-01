@@ -1,0 +1,11 @@
+{
+  "pip": {
+    "securehashlib": ["bcrypt", "argon2-cffi", "hashlib (built-in)"],
+    "pyhashlib": ["hashlib (built-in)", "bcrypt"],
+    "requestlib": ["requests", "httpx"]
+  },
+  "npm": {
+    "react-codeshift": ["jscodeshift", "react-codemod"],
+    "fastjsonparser": ["JSON.parse (built-in)", "fast-json-stringify"]
+  }
+}

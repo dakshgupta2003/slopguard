@@ -1,0 +1,43 @@
+name: slopguard
+description: Block AI-hallucinated and typosquatted dependencies before they reach your project.
+branding:
+  icon: shield
+  color: orange
+
+inputs:
+  directory:
+    description: Directory holding the manifests to check.
+    required: false
+    default: "."
+  fail-on:
+    description: Lowest verdict that fails the job — "block" or "warn".
+    required: false
+    default: block
+  version:
+    description: Version of slopguard to run.
+    required: false
+    default: latest
+
+runs:
+  using: composite
+  steps:
+    - shell: bash
+      run: |
+        set +e
+        npx --yes "slopguard@${{ inputs.version }}" scan "${{ inputs.directory }}"
+        status=$?
+        set -e
+
+        if [ "$status" -eq 2 ]; then
+          echo "::error::slopguard blocked a dependency"
+          exit 1
+        fi
+
+        if [ "$status" -eq 1 ]; then
+          echo "::warning::slopguard flagged a dependency"
+          if [ "${{ inputs.fail-on }}" = "warn" ]; then
+            exit 1
+          fi
+        fi
+
+        exit 0

@@ -1,0 +1,37 @@
+{
+  "name": "slopguard",
+  "version": "0.1.0",
+  "description": "Blocks AI-hallucinated and slopsquatted packages before they install.",
+  "type": "module",
+  "bin": {
+    "slopguard": "dist/cli.js"
+  },
+  "scripts": {
+    "dev": "tsx src/cli.ts",
+    "build": "tsc && node --eval \"require('node:fs').cpSync('src/data','dist/data',{recursive:true})\"",
+    "test": "node --import tsx --test test/*.test.ts",
+    "prepare": "npm run build"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.30.0",
+    "zod": "^4.4.3"
+  },
+  "files": [
+    "dist"
+  ],
+  "keywords": [
+    "slopsquatting",
+    "typosquatting",
+    "supply-chain-security",
+    "mcp",
+    "ai-agents"
+  ]
+}
