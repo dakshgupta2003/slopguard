@@ -1,4 +1,4 @@
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { basename, join } from "node:path";
 import type { Ecosystem } from "../types.js";
 import { parsePackageJson } from "./packageJson.js";
@@ -44,9 +44,14 @@ export function defaultManifestPaths(ecosystem: Ecosystem, directory: string): s
 }
 
 export function allManifestPaths(directory: string): string[] {
-  return Object.keys(FORMATS)
-    .map((name) => join(directory, name))
-    .filter((path) => existsSync(path));
+  try {
+    return readdirSync(directory)
+      .filter((entry) => formatFor(entry))
+      .sort()
+      .map((entry) => join(directory, entry));
+  } catch {
+    return [];
+  }
 }
 
 function formatFor(path: string): ManifestFormat | null {

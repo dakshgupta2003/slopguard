@@ -51,11 +51,26 @@ function writeShims(): void {
 
   const cli = fileURLToPath(new URL("../cli.js", import.meta.url));
   for (const manager of SHIMMED_MANAGERS) {
-    const script = `#!/bin/sh\nexec "${process.execPath}" "${cli}" shim ${manager} "$@"\n`;
     const target = join(dir, manager);
-    writeFileSync(target, script);
+    writeFileSync(target, shimScript(dir, cli, manager));
     chmodSync(target, 0o755);
   }
+}
+
+// If node or the CLI has moved — an nvm upgrade, a relocated clone — the shim must
+// still run the real manager, or every install on the machine stops working. Dropping
+// our own directory from PATH first is what stops the fallback re-entering this shim.
+function shimScript(dir: string, cli: string, manager: string): string {
+  return [
+    "#!/bin/sh",
+    `if [ -x "${process.execPath}" ] && [ -f "${cli}" ]; then`,
+    `  exec "${process.execPath}" "${cli}" shim ${manager} "$@"`,
+    "fi",
+    `PATH=$(printf %s "$PATH" | tr : '\\n' | grep -vxF "${dir}" | paste -sd: -)`,
+    "export PATH",
+    `exec ${manager} "$@"`,
+    "",
+  ].join("\n");
 }
 
 function shellConfigPath(): string {

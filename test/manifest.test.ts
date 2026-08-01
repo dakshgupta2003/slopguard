@@ -1,5 +1,9 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
+import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { basename, join } from "node:path";
+import { tmpdir } from "node:os";
+import { allManifestPaths } from "../src/manifest/index.js";
 import { parsePackageJson } from "../src/manifest/packageJson.js";
 import { parseRequirements } from "../src/manifest/requirements.js";
 import { parsePyproject } from "../src/manifest/pyproject.js";
@@ -55,4 +59,20 @@ flask = "^3.0"
 test("fingerprints a dependency set regardless of ordering", () => {
   assert.equal(fingerprint(["a", "b"]), fingerprint(["b", "a"]));
   assert.notEqual(fingerprint(["a", "b"]), fingerprint(["a", "c"]));
+});
+
+test("scan picks up every requirements file, not just the plain one", () => {
+  const dir = mkdtempSync(join(tmpdir(), "slopguard-"));
+  for (const name of ["requirements-dev.txt", "requirements.txt", "pyproject.toml", "package.json", "README.md"]) {
+    writeFileSync(join(dir, name), "");
+  }
+
+  const found = allManifestPaths(dir).map((path) => basename(path));
+  assert.deepEqual(found, ["package.json", "pyproject.toml", "requirements-dev.txt", "requirements.txt"]);
+
+  rmSync(dir, { recursive: true, force: true });
+});
+
+test("an unreadable directory yields no manifests instead of throwing", () => {
+  assert.deepEqual(allManifestPaths(join(tmpdir(), "slopguard-does-not-exist")), []);
 });

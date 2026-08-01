@@ -45,7 +45,15 @@ WARN  securehashlib (pip)  risk 0/165
 
 ## Install
 
-Requires Node 20+. Not on npm yet, so install from source:
+Requires Node 20+.
+
+```bash
+npm install -g @daksh_dev_2003/slopguard
+```
+
+This installs slopguard once for your whole machine. It is not added as a dependency of any project, and you do not repeat it per repo. The command you type is `slopguard`, even though the package is scoped.
+
+Or from source, if you want to change it:
 
 ```bash
 git clone https://github.com/dakshgupta2003/slopguard
@@ -54,7 +62,7 @@ npm install
 npm link
 ```
 
-This installs slopguard once for your whole machine. It is not added as a dependency of any project, and you do not repeat it per repo. `npm link` points back at the clone, so leave that directory where it is.
+`npm link` points back at the clone, so leave that directory where it is.
 
 Then protect every install on your machine:
 
@@ -62,9 +70,17 @@ Then protect every install on your machine:
 slopguard init
 ```
 
-Open a new terminal. That is the whole setup — `npm`, `pip`, `uv`, `yarn` and `pnpm` are now checked before they run.
+Open a new terminal. That is the whole setup — `npm`, `pip`, `pip3`, `python`, `python3`, `uv`, `uvx`, `yarn`, `pnpm` and `bun` are now checked before they run. `python` and `python3` are included because `python -m pip install` is a real install path; anything else you ask them to do runs straight through.
 
 For `uv` that covers every subcommand which installs from an index: `uv pip install`, `uv pip sync`, `uv add`, `uv sync`, `uv tool install`, `uv tool run`, `uvx` and `uv run --with`. Everything else runs untouched.
+
+To undo all of it:
+
+```bash
+slopguard uninstall
+```
+
+That removes the shims and takes the `PATH` line back out of your shell config.
 
 ## Where it plugs in
 
@@ -74,7 +90,7 @@ For `uv` that covers every subcommand which installs from an index: `uv pip inst
 | Manifest scan | `slopguard scan` | An agent edited `package.json` and ran a bare `npm install` |
 | MCP server | `slopguard mcp` | You want the AI to check *before* it suggests |
 | Pre-commit | `slopguard hook` | Stop a bad dependency entering the repo |
-| CI | `uses: dakshgupta2003/slopguard@v0.1.0` | Stop it entering the repo from someone else's machine |
+| CI | `uses: dakshgupta2003/slopguard@v0` | Stop it entering the repo from someone else's machine |
 
 These overlap on purpose. The shim protects you; CI protects the repo from everyone else.
 
@@ -144,7 +160,7 @@ Or with the [pre-commit](https://pre-commit.com) framework — no Node knowledge
 ```yaml
 repos:
   - repo: https://github.com/dakshgupta2003/slopguard
-    rev: v0.1.0
+    rev: v0
     hooks:
       - id: slopguard
 ```
@@ -152,7 +168,7 @@ repos:
 ### GitHub Actions
 
 ```yaml
-- uses: dakshgupta2003/slopguard@v0.1.0
+- uses: dakshgupta2003/slopguard@v0
   with:
     fail-on: block   # or "warn"
 ```

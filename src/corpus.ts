@@ -1,18 +1,25 @@
 import { loadDataset } from "./dataset.js";
-import { normalize } from "./suggest/similarity.js";
 import type { Ecosystem } from "./types.js";
 
 type Corpus = Record<Ecosystem, string[]>;
 
+const SEPARATOR_RUN = /[-_.]+/g;
+
 const corpus = loadDataset<Corpus>("hallucinations.json");
 
-// pypi treats llama-cpp, llama_cpp and llamacpp as one name, and a model that
-// invents a package usually spells it the way the import reads
 const index: Record<Ecosystem, Set<string>> = {
-  pip: new Set(corpus.pip.map(normalize)),
-  npm: new Set(corpus.npm.map(normalize)),
+  pip: new Set(corpus.pip.map(canonical.bind(null, "pip"))),
+  npm: new Set(corpus.npm.map(canonical.bind(null, "npm"))),
 };
 
 export function inCorpus(ecosystem: Ecosystem, name: string): boolean {
-  return index[ecosystem].has(normalize(name.trim()));
+  return index[ecosystem].has(canonical(ecosystem, name));
+}
+
+// PEP 503: on PyPI a run of - _ . is one separator, so llama_cpp is llama-cpp.
+// It is not deletable — chroma-db and chromadb are two different projects — and
+// on npm the separators are distinct outright.
+function canonical(ecosystem: Ecosystem, name: string): string {
+  const lowered = name.trim().toLowerCase();
+  return ecosystem === "pip" ? lowered.replace(SEPARATOR_RUN, "-") : lowered;
 }

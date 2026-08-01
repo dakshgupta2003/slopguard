@@ -1,7 +1,7 @@
 - id: slopguard
   name: slopguard
   description: Block AI-hallucinated and typosquatted dependencies before they are committed.
-  entry: slopguard scan
+  entry: sh -c 'slopguard scan; [ $? != 2 ]'
   language: node
   pass_filenames: false
   files: (package\.json|requirements.*\.txt|pyproject\.toml)$

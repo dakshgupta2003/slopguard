@@ -22,9 +22,13 @@ runs:
   using: composite
   steps:
     - shell: bash
+      env:
+        SLOPGUARD_DIRECTORY: ${{ inputs.directory }}
+        SLOPGUARD_FAIL_ON: ${{ inputs.fail-on }}
+        SLOPGUARD_VERSION: ${{ inputs.version }}
       run: |
         set +e
-        npx --yes "slopguard@${{ inputs.version }}" scan "${{ inputs.directory }}"
+        npx --yes "@daksh_dev_2003/slopguard@$SLOPGUARD_VERSION" scan "$SLOPGUARD_DIRECTORY"
         status=$?
         set -e
 
@@ -35,9 +39,13 @@ runs:
 
         if [ "$status" -eq 1 ]; then
           echo "::warning::slopguard flagged a dependency"
-          if [ "${{ inputs.fail-on }}" = "warn" ]; then
+          if [ "$SLOPGUARD_FAIL_ON" = "warn" ]; then
             exit 1
           fi
+        fi
+
+        if [ "$status" -gt 2 ]; then
+          echo "::warning::slopguard did not run (exit $status) — nothing was checked"
         fi
 
         exit 0

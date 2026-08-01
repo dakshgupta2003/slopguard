@@ -1,6 +1,6 @@
 {
-  "name": "slopguard",
-  "version": "0.1.0",
+  "name": "@daksh_dev_2003/slopguard",
+  "version": "0.1.1",
   "description": "Blocks AI-hallucinated and slopsquatted packages before they install.",
   "license": "MIT",
   "author": "Daksh Gupta",
@@ -18,12 +18,15 @@
   },
   "scripts": {
     "dev": "tsx src/cli.ts",
-    "build": "tsc && node --eval \"require('node:fs').cpSync('src/data','dist/data',{recursive:true})\"",
+    "build": "node --eval \"require('node:fs').rmSync('dist',{recursive:true,force:true})\" && tsc && node --eval \"require('node:fs').cpSync('src/data','dist/data',{recursive:true})\"",
     "test": "node --import tsx --test test/*.test.ts",
     "prepare": "npm run build"
   },
   "engines": {
     "node": ">=20"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "devDependencies": {
     "@types/node": "^22.10.2",
