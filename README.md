@@ -4,7 +4,7 @@
 [![license](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![node](https://img.shields.io/badge/node-%3E%3D20-brightgreen.svg)](package.json)
 
-Blocks AI-hallucinated and typosquatted dependencies before they install — for npm, pip, yarn and pnpm.
+Blocks AI-hallucinated and typosquatted dependencies before they install — for npm, pip, uv, yarn and pnpm.
 
 ## The attack
 
@@ -62,7 +62,7 @@ Then protect every install on your machine:
 slopguard init
 ```
 
-Open a new terminal. That is the whole setup — `npm`, `pip`, `yarn` and `pnpm` are now checked before they run.
+Open a new terminal. That is the whole setup — `npm`, `pip`, `uv`, `yarn` and `pnpm` are now checked before they run.
 
 ## Where it plugs in
 
@@ -182,7 +182,7 @@ If slopguard cannot reach a registry it allows the install and says so. A securi
 ## Limitations
 
 - Direct dependencies only — transitive and lockfile packages are not checked.
-- `uv pip install` uses its own resolver and is not intercepted.
+- For `uv`, only the subcommands that install from an index are read: `uv pip install`, `uv pip sync`, `uv add`, `uv sync`, `uv tool install`, `uv tool run`, `uvx` and `uv run --with`. Anything else passes straight through.
 - A Python process calling `subprocess.run([sys.executable, "-m", "pip", ...])` bypasses the shim.
 - The hallucination list is a small seed set; the typosquat detectors do the heavy lifting today.
 - `npm link` points at the clone, so moving or deleting that directory breaks the `slopguard` command.
