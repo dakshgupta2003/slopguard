@@ -54,6 +54,8 @@ npm install
 npm link
 ```
 
+This installs slopguard once for your whole machine. It is not added as a dependency of any project, and you do not repeat it per repo.
+
 Then protect every install on your machine:
 
 ```bash
@@ -107,11 +109,13 @@ This covers `pip`, `pip3`, `pip3.13` and `python -m pip`. Venvs created through 
 
 ### AI agents (MCP)
 
+Claude Code — `--scope user` registers it for every project, drop it to register only the current one:
+
 ```bash
-claude mcp add slopguard -- slopguard mcp
+claude mcp add --scope user slopguard -- slopguard mcp
 ```
 
-For Cursor, add to `~/.cursor/mcp.json`:
+Claude Desktop — add to `~/Library/Application Support/Claude/claude_desktop_config.json` and restart:
 
 ```json
 {
@@ -120,6 +124,10 @@ For Cursor, add to `~/.cursor/mcp.json`:
   }
 }
 ```
+
+Cursor — the same block in `~/.cursor/mcp.json`.
+
+Desktop apps do not always inherit your shell `PATH`. If slopguard is not found, replace `"slopguard"` with the full path from `which slopguard`.
 
 The agent then verifies packages while it is still deciding, instead of being blocked afterwards.
 
@@ -177,6 +185,7 @@ If slopguard cannot reach a registry it allows the install and says so. A securi
 - `uv pip install` uses its own resolver and is not intercepted.
 - A Python process calling `subprocess.run([sys.executable, "-m", "pip", ...])` bypasses the shim.
 - The hallucination list is a small seed set; the typosquat detectors do the heavy lifting today.
+- `npm link` points at the clone, so moving or deleting that directory breaks the `slopguard` command.
 
 ## Development
 
